@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from user_posts.views import fetch_instagram_posts
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('fetch_posts/', fetch_instagram_posts)
 ]
