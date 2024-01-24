@@ -121,7 +121,7 @@ def process_data(username):
                 data['text_data'] = data.get('caption')
             save_data_to_mongo(data, config('MONGO_COLLECTION_NAME'))
             
-            return True
+        return True
     except Exception as e:
         print(f'An exception occurred in process_data: {str(e)}')
         return False
