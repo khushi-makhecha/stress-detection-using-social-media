@@ -1,6 +1,7 @@
 import requests
 from decouple import config
-from user_posts.mongo_connection import MongoDBConnection
+from user_posts.utils.mongo_connection import MongoDBConnection
+from user_posts.utils.perform_ocr import perform_image_ocr
 
 def get_user_posts(username):
     try:
@@ -33,7 +34,8 @@ def extract_post_info(username):
         if not user_posts:
             print(f'{username} has no public posts')
             return
-
+        
+        all_posts_processed = []
         for post in user_posts:
             thumbnail_url = None
             instagram_post_url = f'https://www.instagram.com/p/{post.get("code")}/'
@@ -73,11 +75,12 @@ def extract_post_info(username):
             }
 
             save_data_to_mongo(processed_data, config('MONGO_COLLECTION_NAME'))
+            all_posts_processed.append(processed_data)
         
-        return True
+        return all_posts_processed
     except Exception as e:
         print(f'An exception occurred in extract_post_info: {str(e)}')
-        return False
+        return {}
     
 def save_data_to_mongo(data, collection_name):
     try:
@@ -99,3 +102,18 @@ def save_data_to_mongo(data, collection_name):
         print(f'An exception occurred in save_data_to_mongo: {str(e)}')
         return False
             
+
+def process_data(username):
+    try:
+        processed_data = extract_post_info(username)
+        if not processed_data:
+            print('Data not processed')
+            return
+        for data in processed_data:
+            image_for_ocr = data["media_url"] if data["media_type"] == "image" else data["thumbnail_url"]
+            ocr_result = perform_image_ocr(image_for_ocr)
+            data["ocr_result"] = ocr_result
+            save_data_to_mongo(data, config('MONGO_COLLECTION_NAME'))
+    except Exception as e:
+        print(f'An exception occurred in process_data: {str(e)}')
+        return False

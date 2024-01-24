@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from user_posts.views import fetch_instagram_posts
+from user_posts.views import fetch_instagram_posts, check_ocr, fetch_and_process_user_data
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('fetch_posts/', fetch_instagram_posts)
+    path('fetch_posts/', fetch_instagram_posts),
+    path('perform_ocr/', check_ocr),
+    path('process_user_data/', fetch_and_process_user_data)
 ]
