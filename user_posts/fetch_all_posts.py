@@ -2,6 +2,7 @@ import requests
 from decouple import config
 from user_posts.utils.mongo_connection import MongoDBConnection
 from user_posts.utils.perform_ocr import perform_image_ocr
+from user_posts.utils.description_generator import generate_description
 
 def get_user_posts(username):
     try:
@@ -13,8 +14,6 @@ def get_user_posts(username):
             'alternative_method': True,
             'username': username
         }
-            # "user_id": 18428658,
-            # "oldest_timestamp": 1666262030,
         
         posts_url = config('ENSEMBLE_BASE_URL') + config('ENSEMBLE_ENDPOINT_2')
         response = requests.get(url=posts_url, params=params)
@@ -26,6 +25,7 @@ def get_user_posts(username):
         return response
     except Exception as e:
         print(f'An exception occurred in get_user_posts: {str(e)}')
+        return []
 
 
 def extract_post_info(username):
@@ -108,12 +108,20 @@ def process_data(username):
         processed_data = extract_post_info(username)
         if not processed_data:
             print('Data not processed')
-            return
+            return False
+        
         for data in processed_data:
-            image_for_ocr = data["media_url"] if data["media_type"] == "image" else data["thumbnail_url"]
-            ocr_result = perform_image_ocr(image_for_ocr)
-            data["ocr_result"] = ocr_result
+            image_input = data['media_url'] if data['media_type'] == 'image' else data['thumbnail_url']
+            ocr_result = perform_image_ocr(image_input)
+            data['ocr_result'] = ocr_result
+            if not data.get('caption'):
+                description_result = generate_description(image_input)
+                data['text_data'] = description_result
+            else:
+                data['text_data'] = data.get('caption')
             save_data_to_mongo(data, config('MONGO_COLLECTION_NAME'))
+            
+            return True
     except Exception as e:
         print(f'An exception occurred in process_data: {str(e)}')
         return False
