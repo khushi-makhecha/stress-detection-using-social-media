@@ -3,6 +3,7 @@ from decouple import config
 from user_posts.utils.mongo_connection import MongoDBConnection
 from user_posts.utils.perform_ocr import perform_image_ocr
 from user_posts.utils.description_generator import generate_description
+from user_posts.model_tester import predict_stress_level
 
 def get_user_posts(username):
     '''Function that calls the API service for fetching Instagram posts of public accounts.'''
@@ -155,6 +156,8 @@ def process_data(username):
             print('Data not processed')
             return False
         
+        total_posts_with_stress = []
+        
         # Iterates over each and every post
         for data in processed_data:
             # Sets image input as image URL if post has an image; 
@@ -174,9 +177,19 @@ def process_data(username):
 
             # Stores OCR and description results to MongoDB
             save_data_to_mongo(data, config('MONGO_COLLECTION_NAME'))
-            
-        # Returns True if all processes complete without exception; False otherwise
-        return True
+
+            # Checks whether the given post displays stress based on text data and OCR result
+            is_stressful_post = predict_stress_level(data['text_data'])
+            if not is_stressful_post and ocr_result:
+                is_stressful_post = predict_stress_level(ocr_result[0])
+            if is_stressful_post:
+                total_posts_with_stress.append(data['instagram_post_url'])
+
+        # Fetches threshold percentage from config to predict if the user has stress
+        if len(total_posts_with_stress) / len(processed_data) >= int(config('STRESS_THRESHOLD'))/100:
+            return True, total_posts_with_stress
+        else:
+            return False, []
     except Exception as e:
         print(f'An exception occurred in process_data: {str(e)}')
-        return False
+        return False, []

@@ -28,10 +28,10 @@ def check_ocr_view(request):
 def fetch_and_process_user_data_view(request):
     request_data = request.data
     username = request_data.get('username')
-    response = process_data(username)
+    response, response_list = process_data(username)
     if response:
-        return Response('Request processed successfully', status=200)
-    return Response('Request failed. Please check logs for details.', status=400)
+        return Response(f'Stress detected in the user posts.\n{response_list}', status=200)
+    return Response('Stress not found in the user posts', status=200)
 
 
 @api_view(["GET"])
