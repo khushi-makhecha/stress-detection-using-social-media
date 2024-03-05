@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from user_posts.fetch_all_posts import extract_post_info, process_data
 from user_posts.utils import perform_ocr, description_generator
+from user_posts.model_tester import predict_stress_level
 
 
 @api_view(["POST"])
@@ -40,3 +41,11 @@ def description_generator_view(request):
     description_generator.generate_description(image_url)
 
     return Response('Description generated', status=200)
+
+
+@api_view(["POST"])
+def test_model(request):
+    custom_input = request.data.get("text")
+    result = predict_stress_level(custom_input)
+    
+    return Response(f'Stress Result: {result}', status=200)
