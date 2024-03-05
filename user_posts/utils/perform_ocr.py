@@ -1,6 +1,7 @@
 import requests
 from decouple import config
 import json
+import re
 
 
 def perform_image_ocr(image_url):
@@ -31,6 +32,7 @@ def perform_image_ocr(image_url):
             if parsed_text:
                 # Strips new line chars and extra trailing spaces 
                 # and stores text in ocr_result
+                parsed_text = re.sub(r'[\r\n\t]', ' ', parsed_text)
                 ocr_result.append(parsed_text.strip())
 
         # Returns OCR result to the calling function
