@@ -30,7 +30,7 @@ def fetch_and_process_user_data_view(request):
     username = request_data.get('username')
     response, response_list = process_data(username)
     if response:
-        return Response(f'Stress detected in the user posts.\n{response_list}', status=200)
+        return Response(f'Stress detected in the following posts: {response_list}', status=200)
     return Response('Stress not found in the user posts', status=200)
 
 
