@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.views.static import serve
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from user_posts.fetch_all_posts import extract_post_info, process_data
 from user_posts.utils import perform_ocr, description_generator
 from user_posts.model_tester import predict_stress_level
-
+from django.conf import settings
+import os
+from django.shortcuts import redirect
 
 @api_view(["POST"])
 def fetch_instagram_posts_view(request):
@@ -30,8 +32,8 @@ def fetch_and_process_user_data_view(request):
     username = request_data.get('username')
     response, response_list = process_data(username)
     if response:
-        return Response(f'Stress detected in the following posts: {response_list}', status=200)
-    return Response('Stress not found in the user posts', status=200)
+        return redirect('user_stressed')
+    return redirect('user_not_stressed')
 
 
 @api_view(["GET"])
@@ -49,3 +51,15 @@ def test_model(request):
     result = predict_stress_level(custom_input)
     
     return Response(f'Stress Result: {result}', status=200)
+
+
+def serve_index_page(request):
+    return serve(request, 'index.html', os.path.join(settings.BASE_DIR, 'static'))
+
+
+def serve_stressed_page(request):
+    return serve(request, 'stressed.html', os.path.join(settings.BASE_DIR, 'static'))
+
+
+def serve_non_stressed_page(request):
+    return serve(request, 'non_stressed.html', os.path.join(settings.BASE_DIR, 'static'))

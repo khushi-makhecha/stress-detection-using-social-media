@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from user_posts.views import fetch_instagram_posts_view, check_ocr_view, fetch_and_process_user_data_view, description_generator_view, test_model
+from user_posts.views import fetch_instagram_posts_view, check_ocr_view, fetch_and_process_user_data_view, description_generator_view, test_model, serve_index_page, serve_stressed_page, serve_non_stressed_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,7 @@ urlpatterns = [
     path('generate_desc/', description_generator_view),
     path('process_user_data/', fetch_and_process_user_data_view),
     path('test_model/', test_model),
+    path('detect_user_stress/', serve_index_page, name='detect_user_stress'),
+    path('user_stressed/', serve_stressed_page, name='user_stressed'),
+    path('user_not_stressed/', serve_non_stressed_page, name='user_not_stressed'),
 ]

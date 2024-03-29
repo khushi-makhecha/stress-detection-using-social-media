@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Username</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Stress Finder from Instagram</h1>
+    </header>
+    <div class="background"></div>
+    <div class="container">
+        <h1>Enter your Instagram Username</h1>
+        <form action="/process_user_data/" method="post">
+            <input type="text" id="username" name="username" placeholder="Please enter your Instagram username" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="motivation-line">
+        <p class="motivation-text">Finding out stress in its earlier stages is crucial for your well-being.</p>
+    </div>
+    <div class="scroll-down">
+        <p>Scroll down for more</p>
+        <div class="arrow-down"></div>
+    </div>
+  
+    <footer>
+        <a href="/static/stress_relief_tips.html">Click here for stress relief tips</a>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const scroll = document.querySelector('.scroll-down');
+            scroll.classList.toggle("active", window.scrollY > 0)
+        });
+    </script>
+</body>
+</html>
