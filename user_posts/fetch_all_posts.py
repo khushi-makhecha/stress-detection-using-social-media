@@ -156,7 +156,7 @@ def process_data(username):
             print('Data not processed')
             return False
         
-        total_posts_with_stress = []
+        total_posts_with_stress = {}
         
         # Iterates over each and every post
         for data in processed_data:
@@ -183,13 +183,13 @@ def process_data(username):
             if not is_stressful_post and ocr_result:
                 is_stressful_post = predict_stress_level(ocr_result[0])
             if is_stressful_post:
-                total_posts_with_stress.append(data['instagram_post_url'])
+                total_posts_with_stress['text_data'] = data['instagram_post_url']
 
         # Fetches threshold percentage from config to predict if the user has stress
         if len(total_posts_with_stress) / len(processed_data) >= int(config('STRESS_THRESHOLD'))/100:
             return True, total_posts_with_stress
         else:
-            return False, []
+            return False, {}
     except Exception as e:
         print(f'An exception occurred in process_data: {str(e)}')
         return False, []

@@ -30,7 +30,7 @@ def check_ocr_view(request):
 def fetch_and_process_user_data_view(request):
     request_data = request.data
     username = request_data.get('username')
-    response, response_list = process_data(username)
+    response, posts_having_stress = process_data(username)
     if response:
         return redirect('user_stressed')
     return redirect('user_not_stressed')
