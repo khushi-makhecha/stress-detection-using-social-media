@@ -154,7 +154,7 @@ def process_data(username):
         # Returns message and stops execution if processed data is not obtained
         if not processed_data:
             print('Data not processed')
-            return False
+            return False, []
         
         total_posts_with_stress = {}
         

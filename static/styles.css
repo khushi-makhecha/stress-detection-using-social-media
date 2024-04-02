@@ -339,6 +339,11 @@ button:active {
     animation: moveMotivationLine 20s linear infinite;
 }
 
+.scrollable {
+    height: calc(100vh - 100px); /* Adjust the height as needed */
+    overflow-y: auto;
+}
+
 @keyframes moveMotivationLine {
     0% {
         background-position: 0% 50%;
@@ -403,3 +408,4 @@ footer a {
 footer a:hover {
     color: #9b59b6;
 }
+
