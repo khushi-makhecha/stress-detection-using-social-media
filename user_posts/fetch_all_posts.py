@@ -143,13 +143,42 @@ def save_data_to_mongo(data, collection_name):
     except Exception as e:
         print(f'An exception occurred in save_data_to_mongo: {str(e)}')
         return False
+    
+
+def fetch_posts_by_username(username, collection_name):
+    '''Function to fetch all saved posts by username from MongoDB'''
+    try:
+        # Takes connection string and database name from config
+        with MongoDBConnection(
+            config('MONGO_CONNECTION_STRING'),
+            config('MONGO_DB_NAME')
+        ) as mongo_connection:
+            # Accepts collection name from params
+            db = mongo_connection.get_collection(collection_name)
+
+            # Finds all documents matching the given username
+            results = db.find({'username': username})
+
+            # Converts the results to a list (assuming you want to return a list of dictionaries)
+            posts = list(results)
+
+            # Check if posts exist for the user
+            if posts:
+                return posts
+            else:
+                print("No posts found for the specified username.")
+                return []
+    except Exception as e:
+        print(f'An exception occurred in fetch_posts_by_username: {str(e)}')
+        return []
             
 
 def process_data(username):
     '''Function to update user data with OCR and description generator results '''
     try:
         # Fetches and processes user posts
-        processed_data = extract_post_info(username)
+        # processed_data = extract_post_info(username)
+        processed_data = fetch_posts_by_username(username, config('MONGO_COLLECTION_NAME'))
 
         # Returns message and stops execution if processed data is not obtained
         if not processed_data:
@@ -183,7 +212,7 @@ def process_data(username):
             if not is_stressful_post and ocr_result:
                 is_stressful_post = predict_stress_level(ocr_result[0])
             if is_stressful_post:
-                total_posts_with_stress['text_data'] = data['instagram_post_url']
+                total_posts_with_stress[data['text_data']] = data['instagram_post_url']
 
         # Fetches threshold percentage from config to predict if the user has stress
         if len(total_posts_with_stress) / len(processed_data) >= int(config('STRESS_THRESHOLD'))/100:
